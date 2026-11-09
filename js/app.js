@@ -207,6 +207,23 @@
         document.body.appendChild(no);
         Object.assign(no.style, { position: 'fixed', left: nx + 'px', top: ny + 'px', margin: 0, zIndex: 60, pointerEvents: 'none', transition: 'left .45s ease-out, top .45s ease-out' });
         ready = true;
+        // phones have no mouse to chase it with, so there it also wanders about by itself
+        // (and still slides away whenever a finger lands near it)
+        if (matchMedia('(hover: none)').matches) {
+          no.style.transition = 'left .9s ease-in-out, top .9s ease-in-out';
+          setInterval(() => {
+            if (current !== 'ask') return;
+            const w = no.offsetWidth, h = no.offsetHeight, yb = $('#yesBtn').getBoundingClientRect();
+            let x, y, tries = 0;
+            do {
+              x = PAD + Math.random() * (innerWidth - w - PAD * 2);
+              y = 80 + Math.random() * (innerHeight - h - 100);
+              tries++;
+            } while (tries < 20 && Math.hypot(x + w / 2 - (yb.left + yb.width / 2), y + h / 2 - (yb.top + yb.height / 2)) < 120);
+            nx = x; ny = y;
+            no.style.left = nx + 'px'; no.style.top = ny + 'px';
+          }, 2200);
+        }
       }
       function maybeFlee(px, py) {
         if (!ready || current !== 'ask') return;
