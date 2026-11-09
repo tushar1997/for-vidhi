@@ -53,6 +53,13 @@ body[data-scene="hello"] .peek { display: none; }
 #music .m-btn { border: 0; background: #ffe1ea; border-radius: 50%; width: 30px; height: 30px; font-size: .95rem; }
 #music .m-hint { position: absolute; top: calc(100% + 6px); right: 4px; font-family: 'Gaegu', var(--hand); font-weight: 700; font-size: 1.05rem; color: var(--teal); white-space: nowrap; animation: nudge 1.6s ease-in-out infinite; }
 #music.error { display: none; }
+/* phones: the real YouTube ▶ must be tappable (that tap is what allows sound) */
+html.touch #music .m-video iframe { pointer-events: auto; }
+/* while the envelope is up on a phone, show the song card big under it */
+html.touch body.gating #music { top: auto; bottom: 6vh; left: 50%; right: auto; transform: translateX(-50%); width: min(290px, 80vw); z-index: 130; padding: 6px; }
+html.touch body.gating #music .m-title { font-size: 1.2rem; }
+html.touch body.gating #music .m-hint { bottom: calc(100% + 8px); top: auto; left: 50%; right: auto; transform: translateX(-50%); font-size: 1.25rem; color: var(--rose); }
+html.touch body.gating #gate { place-content: start center; padding-top: 12vh; }
 @media (max-width: 760px) {
   #music { top: auto; bottom: 8px; right: auto; left: 8px; transform: rotate(-2deg); width: 118px; padding: 4px; border-radius: 11px; }
   #music .m-bar { gap: 5px; padding: 4px 2px 0; }
