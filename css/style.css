@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,800;1,9..144,500&family=Poppins:wght@500;600&family=Gaegu:wght@700&display=swap');
+
+@view-transition { navigation: auto; }
+
+/* Theme: "peach blossom" — warm peach-cream paper, deep rose, teal & marigold.
+   (--night/--cream keep their names but now mean "page background" / "text on page".) */
+:root {
+  --night: #fff3ea;
+  --night-2: #ffe1ea;
+  --cream: #3a1f2b;
+  --paper: #fffdf8;
+  --ink: #3a1f2b;
+  --muted: #8a6474;
+  --soft: #8a5a6e;
+  --rose: #d6336c;
+  --rose-soft: #c2255c;
+  --marigold: #f08c00;
+  --gold: #e8961e;
+  --sage: #63b38b;
+  --lilac: #9775fa;
+  --teal: #13827b;
+  --hand: 'Caveat', cursive;
+  --serif: 'Fraunces', Georgia, serif;
+  --ui: 'Poppins', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--night);
+  background-image:
+    radial-gradient(ellipse at 15% 5%, rgba(240,140,0,.18), transparent 50%),
+    radial-gradient(ellipse at 90% 95%, rgba(214,51,108,.18), transparent 55%),
+    radial-gradient(ellipse at 85% 10%, rgba(19,130,123,.12), transparent 45%),
+    linear-gradient(160deg, #fff6ee, #ffe9ef 55%, #fff1df);
+  background-attachment: fixed;
+  color: var(--cream);
+  font-family: var(--serif);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+/* soft canvas grain */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .12; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+main { position: relative; z-index: 3; }
+
+/* ---------- fairy lights along the top ---------- */
+.lights { position: fixed; top: -6px; left: 0; width: 100%; height: 70px; z-index: 4; pointer-events: none; }
+.lights path { fill: none; stroke: #5b3d4f; stroke-width: 1.5; }
+.lights .bulb { animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* ---------- floating petals & art bits ---------- */
+.doodles { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+.doodle { position: absolute; top: 0; opacity: .7; animation: fall linear infinite; will-change: transform; }
+@keyframes fall {
+  0% { transform: translate(0, -10vh) rotate(0deg); }
+  50% { transform: translate(30px, 50vh) rotate(180deg); }
+  100% { transform: translate(-20px, 110vh) rotate(360deg); }
+}
+
+/* ---------- sparkle trail ---------- */
+#trail { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+/* ---------- page wipe: a ripple of marigold & rose ---------- */
+.wipe {
+  position: fixed; inset: 0; z-index: 100; pointer-events: none;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), var(--gold), var(--marigold) 30%, var(--rose) 60%, var(--night-2) 100%);
+  clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+}
+.wipe.out { animation: wipeOut .9s cubic-bezier(.7,0,.2,1) forwards; }
+.wipe.in { animation: wipeIn .7s cubic-bezier(.7,0,.2,1) forwards; }
+@keyframes wipeOut { to { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); } }
+@keyframes wipeIn { from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); } to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); } }
+
+/* ---------- progress dots ---------- */
+.steps {
+  position: fixed; top: 22px; left: 50%; transform: translateX(-50%); z-index: 50;
+  display: flex; gap: 8px; padding: 6px 8px; border-radius: 99px;
+  background: rgba(255,255,255,.75); backdrop-filter: blur(8px); border: 1px solid rgba(214,51,108,.25);
+}
+.steps a { width: 10px; height: 10px; border-radius: 50%; background: rgba(58,31,43,.2); display: block; transition: .3s; }
+.steps a.on { background: var(--rose); width: 26px; border-radius: 6px; box-shadow: 0 0 10px rgba(214,51,108,.5); }
+
+/* ---------- characters ---------- */
+.char { width: 100%; height: auto; overflow: visible; display: block; }
+.char .lid { transform-box: fill-box; transform-origin: center top; transform: scaleY(0); animation: blink 4.5s infinite; }
+.char-tushar .lid { animation-delay: 1.3s; }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(0); } 96.5% { transform: scaleY(1); } }
+.char .pupil { transition: transform .08s linear; }
+.hair-sway { transform-origin: 150px 60px; animation: sway 5s ease-in-out infinite; }
+@keyframes sway { 50% { transform: rotate(1.4deg); } }
+.earring { animation: dangle 2.4s ease-in-out infinite; }
+@keyframes dangle { 50% { transform: rotate(7deg); } }
+.prop-brush { transform-origin: 212px 352px; animation: paintStroke 2.2s ease-in-out infinite; }
+@keyframes paintStroke { 50% { transform: rotate(-12deg) translate(-4px, -6px); } }
+.hair-bounce { animation: bounce 3s ease-in-out infinite; }
+@keyframes bounce { 50% { transform: translateY(-2px); } }
+.beat { transform-box: fill-box; transform-origin: center; animation: beat 1s ease-in-out infinite; }
+@keyframes beat { 30% { transform: scale(1.18); } }
+/* photo-based caricature images (drop-in) */
+.portrait { width: 100%; height: auto; display: block; filter: drop-shadow(0 14px 18px rgba(90,30,50,.25)); user-select: none; -webkit-user-drag: none; }
+
+/* ---------- neha-doodles-style stickers & notes ---------- */
+.sticker { filter: drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff) drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff) drop-shadow(0 8px 10px rgba(0,0,0,.45)); }
+.hand-note { font-family: 'Gaegu', var(--hand); font-size: 1.35rem; font-weight: 700; color: var(--teal); white-space: nowrap; line-height: 1.1; }
+.hand-note.dark { color: var(--ink); }
+.peek .char { filter: drop-shadow(0 -4px 12px rgba(0,0,0,.4)); }
+
+/* ---------- shared bits ---------- */
+.hand { font-family: var(--hand); }
+.btn {
+  display: inline-flex; align-items: center; gap: .5em;
+  font: 600 1.05rem var(--ui); color: #fff; background: var(--teal);
+  border: 0; border-radius: 999px; padding: .85em 1.6em;
+  box-shadow: 0 0 0 3px rgba(19,130,123,.18), 0 10px 22px -8px rgba(19,130,123,.6);
+  text-decoration: none; cursor: pointer; transition: transform .2s, box-shadow .2s;
+}
+.btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 0 5px rgba(19,130,123,.22), 0 16px 28px -8px rgba(19,130,123,.7); }
+.btn:active { transform: translateY(1px) scale(.98); }
+.btn.ghost { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 2px rgba(58,31,43,.25), 0 8px 18px -10px rgba(58,31,43,.4); }
+
+.paper {
+  background: var(--paper); color: var(--ink); border-radius: 18px;
+  box-shadow: 0 24px 50px -24px rgba(90,30,50,.35), 0 0 0 1px rgba(214,51,108,.12);
+}
+
+/* ---------- filling meters (Vidhi rose, Tushar amber) ---------- */
+.stat { display: grid; grid-template-columns: 118px 1fr 38px; align-items: center; gap: 8px; font-family: var(--ui); font-size: .78rem; margin: 8px 0; }
+.stat .bar { height: 14px; background: #f1e3e8; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 3px rgba(0,0,0,.12); position: relative; }
+.stat .bar i { display: block; height: 100%; width: 0; border-radius: 8px; position: relative; background-size: 22px 22px; animation: stripes .8s linear infinite; }
+.stat .bar i::after { content: ''; position: absolute; inset: 0 0 50% 0; border-radius: 8px 8px 0 0; background: rgba(255,255,255,.22); }
+.stat .pct { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.v .stat i { background-image: linear-gradient(45deg, rgba(255,255,255,.18) 25%, transparent 25% 50%, rgba(255,255,255,.18) 50% 75%, transparent 75%), linear-gradient(90deg, #8e1b47, #b8215a); }
+.t .stat i { background-image: linear-gradient(45deg, rgba(255,255,255,.18) 25%, transparent 25% 50%, rgba(255,255,255,.18) 50% 75%, transparent 75%), linear-gradient(90deg, #8a4b08, #b85f0a); }
+.v .stat .pct { color: #8e1b47; } .t .stat .pct { color: #8a4b08; }
+@keyframes stripes { to { background-position: 22px 0, 0 0; } }
+
+/* ---------- highlighted date · time · pickup ---------- */
+.event { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+.event .tag {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px 9px 10px; border-radius: 16px; color: #fff; font-family: var(--ui);
+  box-shadow: 0 10px 20px -10px rgba(0,0,0,.45); position: relative; overflow: hidden; transform: rotate(var(--r, 0deg));
+}
+.event .tag::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); animation: shine 3.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes shine { 0%, 60% { left: -60%; } 100% { left: 130%; } }
+.event .tag .ic { width: 36px; height: 36px; border-radius: 12px; background: rgba(255,255,255,.22); display: grid; place-items: center; font-size: 1.2rem; }
+.event .tag small { display: block; font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.event .tag b { display: block; font-size: 1.02rem; line-height: 1.15; }
+.event .date { background: linear-gradient(135deg, #d6336c, #a61e4d); --r: -2deg; }
+.event .time { background: linear-gradient(135deg, #f08c00, #c25e00); --r: 1.5deg; --d: .5s; }
+.event .place { background: linear-gradient(135deg, #13827b, #0b5f5a); --r: -1deg; --d: 1s; }
+
+/* (the old sparkle-trail canvas was removed: it looked like a second cursor) */
+/* ---------- custom cursor: native CSS cursor images, so it moves with zero lag ----------
+   paintbrush normally · heart over anything clickable · paint palette while scrolling */
+html, html * { cursor: url("../images/cursors/brush.svg") 2 28, auto; }
+html a, html button, html [role=button], html .peek, html a *, html button *, html [role=button] * { cursor: url("../images/cursors/heart.svg") 16 16, pointer !important; }
+html.is-scroll, html.is-scroll * { cursor: url("../images/cursors/palette.svg") 16 16, auto !important; }
+
+.scribble-underline { position: relative; white-space: nowrap; }
+.scribble-underline svg { position: absolute; left: -4%; bottom: -.35em; width: 108%; height: .6em; overflow: visible; }
+.scribble-underline path { stroke-dasharray: 400; stroke-dashoffset: 400; animation: draw 1.2s 1s ease forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
