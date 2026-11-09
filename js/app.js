@@ -350,8 +350,13 @@
   if (order.includes(start) && start !== 'hello') { gate.remove(); show(start); }
   else {
     let opened = false;
+    document.body.classList.add('gating');
+    const isTouch = matchMedia('(hover: none)').matches;
+    if (isTouch) gate.querySelector('.gate-text').innerHTML = 'a little something for you…<br><b>tap ▶ on our song below</b> 🎵<br><small>(or tap the envelope)</small>';
+    addEventListener('music-started', () => open());   // phone: tapping ▶ also opens the envelope
     const open = () => {
       if (opened) return; opened = true;
+      document.body.classList.remove('gating');
       gate.classList.add('open');
       setTimeout(() => gsap.to(gate, { opacity: 0, scale: 1.08, duration: .5, onComplete: () => { gate.remove(); show('hello'); } }), 900);
     };

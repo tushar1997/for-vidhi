@@ -8,6 +8,10 @@
 (function () {
   const SONG = { id: 'gurNn33xDF0', loopFrom: 34, loopTo: 44, stanza: 108 };
   let player, ready = false, mode = 'loop', unlocked = false, muted = false, wantStanza = false;
+  // Phones only allow sound when the tap lands INSIDE the YouTube player, so on touch
+  // screens the player is shown with its own ▶ button (no autoplay) and she taps that.
+  const touch = matchMedia('(hover: none)').matches;
+  if (touch) document.documentElement.classList.add('touch');
 
   // the little "now playing" card
   const card = document.createElement('div');
@@ -30,10 +34,11 @@
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('yt', {
       videoId: SONG.id,
-      playerVars: { start: SONG.loopFrom, autoplay: 1, mute: 1, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3 },
+      playerVars: { start: SONG.loopFrom, autoplay: touch ? 0 : 1, mute: touch ? 0 : 1, controls: touch ? 1 : 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3 },
       events: {
         onReady: () => {
           ready = true;
+          if (touch) { hint.textContent = 'tap ▶ to play our song'; btn.textContent = '🔊'; return; }   // wait for her tap on ▶
           if (wantStanza) goStanza();
           if (unlocked) { unmute(); return; }
           // try playing WITH sound straight away; if the browser blocks it, fall back to
@@ -48,6 +53,12 @@
         },
         onStateChange: e => {
           card.classList.toggle('playing', e.data === YT.PlayerState.PLAYING);
+          if (touch && e.data === YT.PlayerState.PLAYING && !unlocked) {
+            // she tapped ▶ on her phone: sound is on now
+            unlocked = true; hint.style.display = 'none';
+            if (mode === 'stanza') player.seekTo(SONG.stanza, true);
+            dispatchEvent(new Event('music-started'));
+          }
           if (e.data === YT.PlayerState.ENDED) { player.seekTo(mode === 'stanza' ? SONG.stanza : SONG.loopFrom, true); player.playVideo(); }
         },
         onError: () => card.classList.add('error'),
@@ -76,13 +87,14 @@
   function goStanza() {
     mode = 'stanza';
     if (!ready) { wantStanza = true; return; }
+    if (touch && !unlocked) return;   // not started yet on the phone; it'll jump to 1:48 when she taps ▶
     player.seekTo(SONG.stanza, true); player.playVideo();
     if (unlocked && !muted) unmute();
   }
 
   // the first tap/click/key anywhere unlocks sound
   const unlock = e => {
-    if (unlocked || (e.target.closest && e.target.closest('#music'))) return;
+    if (touch || unlocked || (e.target.closest && e.target.closest('#music'))) return;
     unlocked = true;
     unmute();
     ['pointerdown', 'keydown', 'touchstart'].forEach(ev => removeEventListener(ev, unlock, true));
