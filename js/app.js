@@ -215,11 +215,14 @@
             if (current !== 'ask') return;
             const w = no.offsetWidth, h = no.offsetHeight, yb = $('#yesBtn').getBoundingClientRect();
             let x, y, tries = 0;
+            // stay in the empty band between the easel and the two caricatures, away from Yes
+            const top = $('#s-ask .canvas').getBoundingClientRect().bottom + 4;
+            const bottom = Math.min($('#whoT').getBoundingClientRect().top, $('#whoV').getBoundingClientRect().top) - h - 4;
             do {
               x = PAD + Math.random() * (innerWidth - w - PAD * 2);
-              y = 80 + Math.random() * (innerHeight - h - 100);
+              y = bottom > top ? top + Math.random() * (bottom - top) : top;
               tries++;
-            } while (tries < 20 && Math.hypot(x + w / 2 - (yb.left + yb.width / 2), y + h / 2 - (yb.top + yb.height / 2)) < 120);
+            } while (tries < 30 && Math.abs(x + w / 2 - (yb.left + yb.width / 2)) < w * .9 + 20 && Math.abs(y + h / 2 - (yb.top + yb.height / 2)) < h + 10);
             nx = x; ny = y;
             no.style.left = nx + 'px'; no.style.top = ny + 'px';
           }, 2200);
@@ -239,6 +242,11 @@
         if (Math.hypot(px - (x + w / 2), py - (y + h / 2)) < FLEE_RADIUS) {
           x = px < innerWidth / 2 ? Math.min(maxX, px + FLEE_RADIUS + 60) : Math.max(PAD, px - FLEE_RADIUS - 60 - w);
           y = py < innerHeight / 2 ? Math.min(maxY, py + FLEE_RADIUS) : Math.max(70, py - FLEE_RADIUS - h);
+        }
+        if (matchMedia('(hover: none)').matches) {   // phones: keep it in the free band, off the caricatures
+          const top = $('#s-ask .canvas').getBoundingClientRect().bottom + 4;
+          const bottom = Math.min($('#whoT').getBoundingClientRect().top, $('#whoV').getBoundingClientRect().top) - h - 4;
+          if (bottom > top) y = Math.max(top, Math.min(bottom, y));
         }
         nx = x; ny = y;
         no.style.left = nx + 'px'; no.style.top = ny + 'px';
@@ -353,10 +361,21 @@
     document.body.classList.add('gating');
     const isTouch = matchMedia('(hover: none)').matches;
     if (isTouch) gate.querySelector('.gate-text').innerHTML = 'a little something for you…<br><b>tap ▶ on our song below</b> 🎵<br><small>(or tap the envelope)</small>';
+    // phone: sit the song card neatly just under the envelope text (no gap, no overlap)
+    const card = $('#music');
+    const placeCard = () => {
+      if (!isTouch || !card || !document.body.classList.contains('gating')) return;
+      const r = gate.querySelector('.gate-text').getBoundingClientRect();
+      card.style.top = Math.round(r.bottom + 16) + 'px'; card.style.bottom = 'auto';
+    };
+    placeCard(); addEventListener('resize', placeCard);
+    if (document.fonts) document.fonts.ready.then(placeCard);   // re-measure once the handwriting font loads
+    const unplaceCard = () => { if (card) { card.style.top = ''; card.style.bottom = ''; } };
     addEventListener('music-started', () => open());   // phone: tapping ▶ also opens the envelope
     const open = () => {
       if (opened) return; opened = true;
       document.body.classList.remove('gating');
+      unplaceCard();
       gate.classList.add('open');
       setTimeout(() => gsap.to(gate, { opacity: 0, scale: 1.08, duration: .5, onComplete: () => { gate.remove(); show('hello'); } }), 900);
     };
